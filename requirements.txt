@@ -1,0 +1,8 @@
+flask
+sqlalchemy
+flask-sqlalchemy
+geopy
+requests
+flask-cors
+pydantic
+sqlitecloud

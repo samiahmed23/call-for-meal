@@ -1,0 +1,6 @@
+data/
+config.py
+myenv/
+pyvenv.cfg
+__pycache__/
+*.pyc
