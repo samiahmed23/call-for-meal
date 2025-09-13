@@ -1,5 +1,5 @@
-from flask import Flask
-from routes import api_blueprint  # Importing routes
+from flask import Flask, render_template
+from routes import api_blueprint
 from flask_cors import CORS
 
 # Initialize Flask App

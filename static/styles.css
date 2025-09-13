@@ -1,0 +1,21 @@
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px auto;
+  }
+
+.flex-item {
+    flex: 0 0 calc(50% - 10px); /* 2 columns, accounting for gap */
+    background-color: #5d9cec;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    box-sizing: border-box;
+  }
+
+#map {
+    height: 500px;
+    width: 100%;
+}

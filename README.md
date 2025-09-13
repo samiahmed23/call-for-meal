@@ -1,2 +1,1 @@
-# call-for-meal
-hophacks25
+# food-discovery-app
