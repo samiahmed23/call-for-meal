@@ -129,6 +129,10 @@ def home_page():
 def app_page():
     return render_template("index.html", api_key=API_KEY)
 
+@api_blueprint.route("/donate", methods=["GET"])
+def donate_page():
+    return render_template("donate.html")
+
 @api_blueprint.route("/agencies", methods=["GET"])
 def get_agencies():
     try:
