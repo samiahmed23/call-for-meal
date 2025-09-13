@@ -1,5 +1,5 @@
-/backend/data
-/backend/config.py
+data/
+config.py
 myenv/
 pyvenv.cfg
 __pycache__/
