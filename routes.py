@@ -122,15 +122,11 @@ def generate_voice_summary(agencies, day_of_week):
 # ----------------------------
 
 @api_blueprint.route("/", methods=["GET"])
-<<<<<<< Updated upstream
-def landing_page():
-=======
 def home_page():
     return render_template("home.html")
 
 @api_blueprint.route("/app", methods=["GET"])
 def app_page():
->>>>>>> Stashed changes
     return render_template("index.html", api_key=API_KEY)
 
 @api_blueprint.route("/agencies", methods=["GET"])
