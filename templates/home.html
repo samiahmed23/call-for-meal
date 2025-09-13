@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NourishAI - Connecting Communities Through Food</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0f9f7 100%);
+            min-height: 100vh;
+            color: #0C4058;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            padding: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(12, 64, 88, 0.1));
+        }
+
+        .tagline {
+            font-size: 18px;
+            font-weight: 400;
+            color: #29A296;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #5DBA68;
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0C4058;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: #114F50;
+            margin-bottom: 50px;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Buttons */
+        .button-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(93, 186, 104, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(93, 186, 104, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #29A296 0%, #0A4058 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(41, 162, 150, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(41, 162, 150, 0.4);
+        }
+
+        /* Carousel */
+        .carousel-section {
+            margin-top: 80px;
+        }
+
+        .carousel-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #0C4058;
+            margin-bottom: 40px;
+        }
+
+        .carousel-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(12, 64, 88, 0.1);
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0f9f7 100%);
+            position: relative;
+        }
+
+        .carousel-placeholder {
+            text-align: center;
+            color: #5DBA68;
+        }
+
+        .carousel-placeholder-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .carousel-placeholder-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #29A296;
+        }
+
+        .carousel-placeholder-subtext {
+            font-size: 14px;
+            color: #114F50;
+            margin-top: 10px;
+        }
+
+        .carousel-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(93, 186, 104, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background: #5DBA68;
+            transform: scale(1.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0C4058 0%, #114F50 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 20px 0;
+            }
+
+            .logo {
+                max-width: 250px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+                margin-bottom: 40px;
+            }
+
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 60px;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                padding: 16px 30px;
+                font-size: 16px;
+            }
+
+            .carousel-section {
+                margin-top: 60px;
+            }
+
+            .carousel-container {
+                margin: 0 15px;
+            }
+
+            .carousel-slide {
+                height: 300px;
+            }
+
+            .carousel-placeholder-icon {
+                font-size: 48px;
+            }
+
+            .carousel-placeholder-text {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 14px 25px;
+                font-size: 15px;
+            }
+
+            .carousel-slide {
+                height: 250px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .fade-in-up-delay {
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .fade-in-up-delay-2 {
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <!-- <header class="header fade-in-up">
+            <img src="{{ url_for('static', filename='Full logo.svg') }}" alt="NourishAI Logo" class="logo">
+            <div class="tagline">Connecting Communities Through Food</div>
+            <div class="subtitle">Powered by AI • Built with Compassion</div>
+        </header> -->
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <img src="{{ url_for('static', filename='Logo1.png') }}" alt="NourishAI Logo" class="logo">
+            <h1 class="hero-title fade-in-up-delay">NourishAI</h1>
+            <p class="hero-subtitle fade-in-up-delay">
+                Bridging the gap between those in need and food resources in your community. 
+                Find help or make a difference today.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="button-container fade-in-up-delay-2">
+                <a href="/app" class="btn btn-primary">
+                    I Need Food
+                </a>
+                <a href="#" class="btn btn-secondary" onclick="showContributeModal()">
+                    Support Our Mission
+                </a>
+            </div>
+
+            <!-- Carousel Section -->
+            <section class="carousel-section fade-in-up-delay-2">
+                <h2 class="carousel-title">Community Impact</h2>
+                <div class="carousel-container">
+                    <div class="carousel-slide">
+                        <div class="carousel-placeholder">
+                            <div class="carousel-placeholder-icon">🍽️</div>
+                            <div class="carousel-placeholder-text">Food Donation Events</div>
+                            <div class="carousel-placeholder-subtext">Images of community food drives and donation events will appear here</div>
+                        </div>
+                    </div>
+                    <div class="carousel-nav">
+                        <div class="carousel-dot active"></div>
+                        <div class="carousel-dot"></div>
+                        <div class="carousel-dot"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">
+                © 2025 NourishAI. Making food accessible to everyone, everywhere.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Contribute Modal -->
+    <div id="contributeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; position: relative;">
+            <button onclick="closeContributeModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+            <h2 style="color: #0C4058; margin-bottom: 20px; font-size: 28px;">Support Our Mission</h2>
+            <p style="color: #114F50; margin-bottom: 30px; line-height: 1.6;">
+                Help us connect communities through food. Choose how you'd like to contribute:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="#" style="background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%); color: white; padding: 15px 25px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    💰 Donate Money
+                </a>
+                <a href="#" style="background: linear-gradient(135deg, #29A296 0%, #0A4058 100%); color: white; padding: 15px 25px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    🍎 Donate Food
+                </a>
+                <a href="#" style="background: linear-gradient(135deg, #114F50 0%, #0C4058 100%); color: white; padding: 15px 25px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    🤝 Become a Volunteer
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showContributeModal() {
+            document.getElementById('contributeModal').style.display = 'flex';
+        }
+
+        function closeContributeModal() {
+            document.getElementById('contributeModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('contributeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeContributeModal();
+            }
+        });
+
+        // Simple carousel functionality
+        let currentSlide = 0;
+        const dots = document.querySelectorAll('.carousel-dot');
+        
+        function updateCarousel() {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                updateCarousel();
+            });
+        });
+
+        // Auto-advance carousel
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % dots.length;
+            updateCarousel();
+        }, 5000);
+    </script>
+</body>
+</html>
