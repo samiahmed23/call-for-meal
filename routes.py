@@ -117,6 +117,81 @@ def generate_voice_summary(agencies, day_of_week):
     summary += "Would you like directions or to hear more options?"
     return summary
 
+
+def fetch_filtered_agencies(address, day_of_week, max_distance=5.0):
+    try:
+        user_lat, user_lon = get_lat_lon(address)
+        if not user_lat or not user_lon:
+            return {"error": "Invalid location"}, 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT a.agency_id, a.name, a.type, a.address, a.phone, a.latitude, a.longitude,
+                   h.day_of_week, h.start_time, h.end_time, h.frequency,
+                   h.distribution_model, h.food_format, h.appointment_only, h.pantry_requirements,
+                   w.service, c.cultures
+            FROM agencies a
+            JOIN hours_of_operation h ON a.agency_id = h.agency_id
+            LEFT JOIN wraparound_services w ON a.agency_id = w.agency_id
+            LEFT JOIN cultures_served c ON a.agency_id = c.agency_id
+            WHERE lower(h.day_of_week) = ?
+        """, (day_of_week.lower(),))
+
+        agency_map = {}
+        for row in cursor.fetchall():
+            (
+                aid, name, typ, address, phone, lat, lon,
+                dow, start, end, freq, model, fmt, appt, pantry,
+                service, culture
+            ) = row
+
+            distance = calculate_distance(user_lat, user_lon, lat, lon)
+            if distance > max_distance:
+                continue
+
+            if aid not in agency_map:
+                agency_map[aid] = {
+                    "id": aid,
+                    "name": name,
+                    "type": typ,
+                    "address": address,
+                    "phone": phone,
+                    "latitude": lat,
+                    "longitude": lon,
+                    "distance": round(distance, 2),
+                    "day_of_week": dow,
+                    "start_time": start,
+                    "end_time": end,
+                    "frequency": freq,
+                    "distribution_model": model,
+                    "food_format": fmt,
+                    "appointment_only": bool(appt),
+                    "pantry_requirements": pantry,
+                    "wraparound_services": set(),
+                    "cultures_served": set()
+                }
+
+            if service:
+                agency_map[aid]["wraparound_services"].add(service)
+            if culture:
+                agency_map[aid]["cultures_served"].add(culture)
+
+        result = []
+        for agency in agency_map.values():
+            agency["wraparound_services"] = list(agency["wraparound_services"])
+            agency["cultures_served"] = list(agency["cultures_served"])
+            result.append(agency)
+
+        result.sort(key=lambda x: x["distance"])
+        conn.close()
+        return result, 200
+
+    except Exception as e:
+        logging.error(f"Expert Query Error: {e}")
+        return {"error": str(e)}, 500
+
 # ----------------------------
 # Routes
 # ----------------------------
@@ -315,85 +390,16 @@ def search_agencies():
 
 @api_blueprint.route("/expertquery", methods=["GET"])
 def get_filtered_agencies():
-    try:
-        address = request.args.get("address")
-        day_of_week = request.args.get("day_of_week")
-        max_distance = float(request.args.get("max_distance", 5.0))
-
-        user_lat, user_lon = get_lat_lon(address)
-        if not user_lat or not user_lon:
-            return jsonify({"error": "Invalid location"}), 400
-
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        # This query retrieves all necessary agency data with joins
-        cursor.execute("""
-            SELECT a.agency_id, a.name, a.type, a.address, a.phone, a.latitude, a.longitude,
-                   h.day_of_week, h.start_time, h.end_time, h.frequency,
-                   h.distribution_model, h.food_format, h.appointment_only, h.pantry_requirements,
-                   w.service, c.cultures
-            FROM agencies a
-            JOIN hours_of_operation h ON a.agency_id = h.agency_id
-            LEFT JOIN wraparound_services w ON a.agency_id = w.agency_id
-            LEFT JOIN cultures_served c ON a.agency_id = c.agency_id
-            WHERE lower(h.day_of_week) = ?
-        """, (day_of_week.lower(),))
-
-        agency_map = {}
-
-        for row in cursor.fetchall():
-            (
-                aid, name, typ, address, phone, lat, lon,
-                dow, start, end, freq, model, fmt, appt, pantry,
-                service, culture
-            ) = row
-
-            distance = calculate_distance(user_lat, user_lon, lat, lon)
-            if distance > max_distance:
-                continue
-
-            if aid not in agency_map:
-                agency_map[aid] = {
-                    "id": aid,
-                    "name": name,
-                    "type": typ,
-                    "address": address,
-                    "phone": phone,
-                    "latitude": lat,
-                    "longitude": lon,
-                    "distance": round(distance, 2),
-                    "day_of_week": dow,
-                    "start_time": start,
-                    "end_time": end,
-                    "frequency": freq,
-                    "distribution_model": model,
-                    "food_format": fmt,
-                    "appointment_only": bool(appt),
-                    "pantry_requirements": pantry,
-                    "wraparound_services": set(),
-                    "cultures_served": set()
-                }
-
-            if service:
-                agency_map[aid]["wraparound_services"].add(service)
-            if culture:
-                agency_map[aid]["cultures_served"].add(culture)
-
-        # Final cleanup and formatting
-        result = []
-        for agency in agency_map.values():
-            agency["wraparound_services"] = list(agency["wraparound_services"])
-            agency["cultures_served"] = list(agency["cultures_served"])
-            result.append(agency)
-
-        result.sort(key=lambda x: x["distance"])
-        conn.close()
-        return jsonify(result), 200
-
-    except Exception as e:
-        logging.error(f"Expert Query Error: {e}")
-        return jsonify({"error": str(e)}), 500
+    address = request.args.get("address")
+    day_of_week = request.args.get("day_of_week")
+    max_distance = float(request.args.get("max_distance", 5.0))
+    
+    agencies, status_code = fetch_filtered_agencies(address, day_of_week, max_distance)
+    
+    if status_code != 200:
+        return jsonify(agencies), status_code
+        
+    return jsonify(agencies), 200
 
 
 # ----------------------------
@@ -417,15 +423,11 @@ class VapiRequest(BaseModel):
 @api_blueprint.route("/vapi_expertquery", methods=["POST"])
 def vapi_tool_handler():
     try:
-        print("Received tool call from VAPI 1:", request)
-
         payload = request.get_json(force=True)
-        # print("Payload received:", payload)
-
         data = VapiRequest(**payload)
 
         for tool_call in data.message.toolCalls:
-            if tool_call.function.name == "getFoodSites":
+            if tool_call.function.name == "getFoodDistributionSites":
                 args = tool_call.function.arguments
                 if isinstance(args, str):
                     args = json.loads(args)
@@ -433,16 +435,12 @@ def vapi_tool_handler():
                 address = args["address"]
                 day_of_week = args["day_of_week"]
 
-                # Simulate query string for reuse
-                request.args = {
-                    "address": address,
-                    "day_of_week": day_of_week
-                }
+                # Call the new function directly with the parsed arguments
+                response_data, status_code = fetch_filtered_agencies(address, day_of_week)
 
-                # Get response and status from existing function
-                response, status_code = get_filtered_agencies()
-                response_data = response.get_json()
-                
+                if status_code != 200:
+                    return jsonify({"results": [{"toolCallId": tool_call.id, "result": json.dumps(response_data)}]}), status_code
+
                 summary = generate_voice_summary(response_data, day_of_week.title())
 
                 return jsonify({
