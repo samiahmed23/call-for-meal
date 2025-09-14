@@ -6,3 +6,4 @@ requests
 flask-cors
 pydantic
 sqlitecloud
+google.generativeai
