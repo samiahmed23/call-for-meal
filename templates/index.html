@@ -369,6 +369,29 @@
       }
     }
 
+    /* Google Maps Info Window Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .gm-style-iw {
+        max-width: 280px !important;
+      }
+      
+      .gm-style-iw-d {
+        max-width: 280px !important;
+        overflow: hidden !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .gm-style-iw {
+        max-width: 250px !important;
+      }
+      
+      .gm-style-iw-d {
+        max-width: 250px !important;
+        overflow: hidden !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -546,34 +569,89 @@
           map.setCenter({ lat: data[0].latitude, lng: data[0].longitude });
 
           data.forEach(site => {
-            // Use bright orange marker for agencies with updates
-            const markerColor = site.has_updates ? '#FF4500' : '#5DBA68';
-            const markerIcon = site.has_updates ? 
-              'http://maps.google.com/mapfiles/ms/icons/orange-dot.png' : 
-              'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+            // Use bright yellow with pulsing animation for agencies with updates, default red for others
+            const hasUpdates = site.updates && site.updates.trim() !== '';
+            const markerIcon = hasUpdates ? 
+              'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png' : 
+              'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             
             const marker = new google.maps.Marker({
               position: { lat: site.latitude, lng: site.longitude },
               map: map,
               title: site.name,
               phone: site.phone,
-              icon: markerIcon
+              icon: markerIcon,
+              animation: hasUpdates ? google.maps.Animation.BOUNCE : null
             });
 
-            const updatesInfo = site.has_updates ? 
-              `<br><strong style="color: #FF4500; font-size: 14px; background: #FFF3E0; padding: 5px; border-radius: 5px; display: inline-block;">📢 ${site.updates}</strong><br>` : '';
+            // Stop bouncing animation after 3 seconds for markers with updates
+            if (hasUpdates) {
+              setTimeout(() => {
+                marker.setAnimation(null);
+              }, 3000);
+            }
+
+            // Modern info window content
+            const updatesInfo = hasUpdates ? 
+              `<div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; padding: 12px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
+                  <span style="font-size: 16px;">📢</span>
+                  <span>${site.updates}</span>
+                </div>
+              </div>` : '';
             
             const info = new google.maps.InfoWindow({
-              content: `<strong>${site.name}</strong><br><br>
-              <strong>Address:</strong> ${site.address}<br>
-              <strong>Distance:</strong> ${site.distance} mi away <br>
-              <strong>Phone:</strong> ${site.phone}<br>
-              <strong>Hours of Operation:</strong> ${site.hours}<br>  
-              <strong>Appointment:</strong> ${site.appointment}<br>
-              <strong>Prepared Meals:</strong> ${site.Prepared_meals}<br>
-              <strong>Home Delivery:</strong> ${site.home_delivery}<br>
-              ${updatesInfo}
-              <button onclick="navigateTo(${site.latitude}, ${site.longitude})">Get Directions</button>`
+              content: `
+                <div style="font-family: 'Inter', sans-serif; max-width: 300px; line-height: 1.5;">
+                  <h3 style="margin: 0 0 16px 0; color: #0C4058; font-size: 18px; font-weight: 600; border-bottom: 2px solid #5DBA68; padding-bottom: 8px;">
+                    ${site.name}
+                  </h3>
+                  
+                  ${updatesInfo}
+                  
+                  <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📍</span>
+                      <span style="color: #0C4058;">${site.address}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📏</span>
+                      <span style="color: #0C4058;">${site.distance} mi away</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📞</span>
+                      <span style="color: #0C4058;">${site.phone}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🕒</span>
+                      <span style="color: #0C4058;">${site.hours}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📋</span>
+                      <span style="color: #0C4058;">${site.appointment}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🍽️</span>
+                      <span style="color: #0C4058;">${site.Prepared_meals}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🚚</span>
+                      <span style="color: #0C4058;">${site.home_delivery}</span>
+                    </div>
+                  </div>
+                  
+                  <button onclick="navigateTo(${site.latitude}, ${site.longitude})" 
+                          style="width: 100%; background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; margin-top: 16px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(93, 186, 104, 0.3);">
+                    🗺️ Get Directions
+                  </button>
+                </div>
+              `
             });
 
             marker.addListener("click", () => info.open(map, marker));
@@ -601,34 +679,89 @@
           map.setCenter(originCoords);
 
           data.forEach(site => {
-            // Use bright orange marker for agencies with updates
-            const markerColor = site.has_updates ? '#FF4500' : '#5DBA68';
-            const markerIcon = site.has_updates ? 
-              'http://maps.google.com/mapfiles/ms/icons/orange-dot.png' : 
-              'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+            // Use bright yellow with pulsing animation for agencies with updates, default red for others
+            const hasUpdates = site.updates && site.updates.trim() !== '';
+            const markerIcon = hasUpdates ? 
+              'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png' : 
+              'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             
             const marker = new google.maps.Marker({
               position: { lat: site.latitude, lng: site.longitude },
               map: map,
               title: site.name,
               phone: site.phone,
-              icon: markerIcon
+              icon: markerIcon,
+              animation: hasUpdates ? google.maps.Animation.BOUNCE : null
             });
 
-            const updatesInfo = site.has_updates ? 
-              `<br><strong style="color: #FF4500; font-size: 14px; background: #FFF3E0; padding: 5px; border-radius: 5px; display: inline-block;">📢 ${site.updates}</strong><br>` : '';
+            // Stop bouncing animation after 3 seconds for markers with updates
+            if (hasUpdates) {
+              setTimeout(() => {
+                marker.setAnimation(null);
+              }, 3000);
+            }
+
+            // Modern info window content
+            const updatesInfo = hasUpdates ? 
+              `<div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; padding: 12px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
+                  <span style="font-size: 16px;">📢</span>
+                  <span>${site.updates}</span>
+                </div>
+              </div>` : '';
             
             const info = new google.maps.InfoWindow({
-              content: `<strong>${site.name}</strong><br><br>
-              <strong>Address:</strong> ${site.address}<br>
-              <strong>Distance:</strong> ${site.distance} mi away <br>
-              <strong>Phone:</strong> ${site.phone}<br>
-              <strong>Hours of Operation:</strong> ${site.hours}<br>
-              <strong>Appointment:</strong> ${site.appointment}<br>
-              <strong>Prepared Meals:</strong> ${site.Prepared_meals}<br>
-              <strong>Home Delivery:</strong> ${site.home_delivery}<br>
-              ${updatesInfo}
-              <button onclick="navigateTo(${site.latitude}, ${site.longitude})">Get Directions</button>`
+              content: `
+                <div style="font-family: 'Inter', sans-serif; max-width: 300px; line-height: 1.5;">
+                  <h3 style="margin: 0 0 16px 0; color: #0C4058; font-size: 18px; font-weight: 600; border-bottom: 2px solid #5DBA68; padding-bottom: 8px;">
+                    ${site.name}
+                  </h3>
+                  
+                  ${updatesInfo}
+                  
+                  <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📍</span>
+                      <span style="color: #0C4058;">${site.address}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📏</span>
+                      <span style="color: #0C4058;">${site.distance} mi away</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📞</span>
+                      <span style="color: #0C4058;">${site.phone}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🕒</span>
+                      <span style="color: #0C4058;">${site.hours}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📋</span>
+                      <span style="color: #0C4058;">${site.appointment}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🍽️</span>
+                      <span style="color: #0C4058;">${site.Prepared_meals}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🚚</span>
+                      <span style="color: #0C4058;">${site.home_delivery}</span>
+                    </div>
+                  </div>
+                  
+                  <button onclick="navigateTo(${site.latitude}, ${site.longitude})" 
+                          style="width: 100%; background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; margin-top: 16px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(93, 186, 104, 0.3);">
+                    🗺️ Get Directions
+                  </button>
+                </div>
+              `
             });
 
             marker.addListener("click", () => info.open(map, marker));

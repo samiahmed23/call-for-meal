@@ -8,7 +8,7 @@ import requests
 from pydantic import BaseModel, ValidationError
 from typing import List, Dict, Union
 from config import API_KEY, GEMINI_API_KEY
-from datetime import datetime
+from datetime import datetime, timedelta
 import google.generativeai as genai
 
 api_blueprint = Blueprint("api", __name__)
@@ -151,7 +151,7 @@ def fetch_filtered_agencies(address, day_of_week, max_distance=5.0):
             SELECT a.agency_id, a.name, a.type, a.address, a.phone, a.latitude, a.longitude,
                    h.day_of_week, h.start_time, h.end_time, h.frequency,
                    h.distribution_model, h.food_format, h.appointment_only, h.pantry_requirements,
-                   w.service, c.cultures
+                   w.service, c.cultures, a.updates
             FROM agencies a
             JOIN hours_of_operation h ON a.agency_id = h.agency_id
             LEFT JOIN wraparound_services w ON a.agency_id = w.agency_id
@@ -164,7 +164,7 @@ def fetch_filtered_agencies(address, day_of_week, max_distance=5.0):
             (
                 aid, name, typ, address, phone, lat, lon,
                 dow, start, end, freq, model, fmt, appt, pantry,
-                service, culture
+                service, culture, updates
             ) = row
 
             distance = calculate_distance(user_lat, user_lon, lat, lon)
@@ -189,6 +189,7 @@ def fetch_filtered_agencies(address, day_of_week, max_distance=5.0):
                     "food_format": fmt,
                     "appointment_only": bool(appt),
                     "pantry_requirements": pantry,
+                    "updates": updates,
                     "wraparound_services": set(),
                     "cultures_served": set()
                 }
@@ -268,6 +269,8 @@ def search_agencies():
     day = request.args.get("day")  # Day of the week for filtering
     home_delivery = request.args.get("homeDelivery") == "true"  # Home delivery option
     
+    # Clear old updates automatically when searching
+    clear_old_updates()
    
     user_coords = get_lat_lon_by_address(address)
     conn = get_connection()
@@ -276,7 +279,7 @@ def search_agencies():
     # This query retrieves all necessary agency data with joins
     agencies = cursor.execute("""SELECT a.agency_id, a.name, a.type, a.address, a.phone, a.latitude, a.longitude,
                    h.day_of_week, h.start_time, h.end_time ,h.distribution_model, h.food_format, h.appointment_only, h.pantry_requirements,
-                   w.service, c.cultures, a.updates, a.last_update_time
+                   w.service, c.cultures, a.updates
             FROM agencies a
             JOIN hours_of_operation h ON a.agency_id = h.agency_id
             LEFT JOIN wraparound_services w ON a.agency_id = w.agency_id
@@ -284,106 +287,84 @@ def search_agencies():
     conn.close()
     
     nearby_agencies = []
+    agency_map = {}
     
-
     for agency in agencies:
-        agency_id, name, type, address, phone, latitude, longitude, day_of_week, start_time, end_time, distribution, food_format, appointment, pantry_req, wrap_service, culture, updates, last_update_time = agency  # unpack tuple
+        agency_id, name, type, address, phone, latitude, longitude, day_of_week, start_time, end_time, distribution, food_format, appointment, pantry_req, wrap_service, culture, updates = agency  # unpack tuple
         agency_coords = (latitude, longitude)
         distance = geodesic(user_coords, agency_coords).miles  # Calculate distance
-        
         
         if day_of_week is None:
             day_of_week = "Null"
 
         if distance <= radius and (day_of_week.lower() == day.lower() or day_of_week.lower() == "As Needed"):  # Check if the agency is within the radius and matches the day of the week
-            # Only include agencies that match the day of the week and within the radius
             
+            # Only process each agency once using agency_map for deduplication
+            if agency_id not in agency_map:
+                # Prepared meals availability
+                if food_format is None:
+                    food_format = "N/A"
+                if "Prepared meals" in food_format:
+                    food_format = "Available✅"
+                else:
+                    food_format = "Not available❌"
             
-            #### These will be used to in the location info window (fixing some inconsistencies in the database) ####
-            
-            
-            # Prepared meals availability
-            
-            if food_format is None:
-                food_format = "N/A"
-            if "Prepared meals" in food_format:
-                food_format = "Available✅"
-            else:
-                food_format = "Not available❌"
-        
-            
-            # Appointment requirements
-            
-            if appointment is None:
-                appointment = "N/A"
-            if appointment == 1:
-                appointment = "Required⚠️"
-            else:
-                appointment = "Not required✅"    
-            
-            
-            
-            # Home delivery availability
-            if distribution is None:
-                distribution = "N/A"
-            if "Home Delivery" in distribution:
-                hd_status = "Available✅"
-            else:
-                hd_status = "Not available❌"   
+                # Appointment requirements
+                if appointment is None:
+                    appointment = "N/A"
+                if appointment == 1:
+                    appointment = "Required⚠️"
+                else:
+                    appointment = "Not required✅"    
                 
-                
-            # Start and end times
-            if start_time is None:
-                start_time = "N/A"     
-            if end_time is None:
-                end_time = "N/A"
-            open_hours = start_time[:5] + " - " + end_time[:5]
-            
-            
-            # Dealing with address inconsistencies ('Attn:' prefix in some addresses)
-            if address[:5] == "Attn:":
-                address = address[5:]
+                # Home delivery availability
+                if distribution is None:
+                    distribution = "N/A"
+                if "Home Delivery" in distribution:
+                    hd_status = "Available✅"
+                else:
+                    hd_status = "Not available❌"   
                     
+                # Start and end times
+                if start_time is None:
+                    start_time = "N/A"     
+                if end_time is None:
+                    end_time = "N/A"
+                open_hours = start_time[:5] + " - " + end_time[:5]
                 
-            if "Home Delivery" in distribution and home_delivery:   # Only include agencies that offer home delivery if the user selected that option
-                nearby_agencies.append({
-                "id": agency_id,
-                "name": name.split(':')[1].strip() if ':' in name else name,
-                "latitude": latitude,
-                "longitude": longitude,
-                "distance": round(distance, 2),
-                "phone": phone if phone else "No phone number available",
-                "day": day_of_week,
-                "Prepared_meals": food_format,
-                "appointment": appointment,
-                "home_delivery": hd_status,
-                "address": address,
-                "hours": open_hours,
-                "updates": updates, 
-                "last_update_time": last_update_time,
-            })
+                # Dealing with address inconsistencies ('Attn:' prefix in some addresses)
+                if address and address[:5] == "Attn:":
+                    address = address[5:]
                 
-            
-            elif not home_delivery: # If the user did not select home delivery, include all agencies that match the day of the week and are within the radius
-            
-                nearby_agencies.append({
-                    "id": agency_id,
-                    "name": name.split(':')[1].strip() if ':' in name else name,
-                    "latitude": latitude,
-                    "longitude": longitude,
-                    "distance": round(distance, 2),
-                    "phone": phone if phone else "No phone number available",
-                    "day": day_of_week,
-                    "Prepared_meals": food_format,
-                    "appointment": appointment,
-                    "home_delivery": hd_status,
-                    "address": address,
-                    "hours": open_hours,
-                    "updates": updates, 
-                    "last_update_time": last_update_time,
-                })
-            
-        
+                # Check if agency should be included based on home delivery preference
+                should_include = False
+                if "Home Delivery" in distribution and home_delivery:
+                    should_include = True
+                elif not home_delivery:
+                    should_include = True
+                
+                if should_include:
+                    agency_map[agency_id] = {
+                        "id": agency_id,
+                        "name": name.split(':')[1].strip() if ':' in name else name,
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "distance": round(distance, 2),
+                        "phone": phone if phone else "No phone number available",
+                        "day": day_of_week,
+                        "Prepared_meals": food_format,
+                        "appointment": appointment,
+                        "home_delivery": hd_status,
+                        "address": address,
+                        "hours": open_hours,
+                        "updates": updates,
+                    }
+    
+    # Convert agency_map to list
+    nearby_agencies = list(agency_map.values())
+    
+    # Sort by distance
+    nearby_agencies.sort(key=lambda x: x["distance"])
     
     return jsonify(nearby_agencies)
 
@@ -517,52 +498,6 @@ def on_call_end():
         print("Received call end event:", data)
         return jsonify({"message": "Call end event received"}), 200
 
-        # # Fetch call details from VAPI
-        # response = requests.get(
-        #     f"https://api.vapi.ai/call/{call_id}",
-        #     headers={"Authorization": "Bearer YOUR_VAPI_API_KEY"}
-        # )
-        # if response.status_code != 200:
-        #     return jsonify({"error": "Failed to fetch VAPI data"}), 502
-
-        # call_data = response.json()
-
-        # # Extract fields
-        # call_type = call_data.get("type")
-        # user_phone = call_data.get("customer", {}).get("number")
-        # summary = call_data.get("analysis", {}).get("summary")
-        # recording_url = call_data.get("recordingUrl")
-        # stereo_recording_url = call_data.get("stereoRecordingUrl")
-        # call_time = call_data.get("createdAt")
-        # duration = call_data.get("duration")
-        # messages = json.dumps(call_data.get("messages", []), indent=2)
-
-        # # Convert time
-        # call_time = datetime.fromisoformat(call_time.replace("Z", "+00:00"))
-
-        # conn = get_connection()
-        # cursor = conn.cursor()
-
-        # # Check if already exists
-        # cursor.execute("SELECT 1 FROM call_logs WHERE call_id = ?", (call_id,))
-        # if cursor.fetchone():
-        #     return jsonify({"message": "Call already logged"}), 200
-
-        # # Insert log
-        # cursor.execute("""
-        #     INSERT INTO call_logs (
-        #         call_id, type, user_phone, site_rating, agent_rating,
-        #         summary, recording_url, stereo_recording_url,
-        #         call_time, call_duration, messages
-        #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        # """, (
-        #     call_id, call_type, user_phone, site_rating, agent_rating,
-        #     summary, recording_url, stereo_recording_url,
-        #     call_time, duration, messages
-        # ))
-
-        # conn.commit()
-        # return jsonify({"message": "Call log recorded"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -571,131 +506,6 @@ def on_call_end():
 # Donation Chat Route
 # ----------------------------
 
-# @api_blueprint.route("/donate/chat", methods=["POST"])
-# def donate_chat():
-#     try:
-#         data = request.get_json()
-#         user_message = data.get("message", "").strip()
-#         chat_history = data.get("history", [])
-        
-#         if not user_message:
-#             return jsonify({"error": "Message is required"}), 400
-                
-#         # Create conversation context
-#         conversation_context = """
-#         You are a helpful assistant for a food donation platform. Your role is to:
-#         1. Help users specify what they want to donate
-#         2. Ask for their zip code to find nearby food providers
-#         3. Guide them through the donation process
-        
-#         Keep responses concise and friendly. Always ask for zip code after the user specifies what they want to donate.
-#         """
-        
-#         # Build conversation history for context
-#         full_conversation = conversation_context + "\n\n"
-#         for msg in chat_history:
-#             role = "User" if msg.get("role") == "user" else "Assistant"
-#             full_conversation += f"{role}: {msg.get('content', '')}\n"
-        
-#         full_conversation += f"User: {user_message}\nAssistant:"
-        
-#         # Get response from Gemini
-#         try:
-#             response = model.generate_content(full_conversation)
-#             ai_response = response.text.strip()
-#         except Exception as e:
-#             logging.error(f"Gemini API error: {e}")
-#             return jsonify({"error": f"AI service error: {str(e)}"}), 500
-        
-#         # Check if user provided donation details and we need zip code
-#         needs_zip = False
-#         extracted_food_item = None
-        
-#         # if any(keyword in user_message.lower() for keyword in ['donate', 'give', 'have', 'want to donate']):
-#         if not any(msg.get('content', '').lower().find('zip') != -1 for msg in chat_history):
-#             needs_zip = True
-#             ai_response = f"Great! To help you find the best place to donate, please provide your zip code so I can show you nearby food providers."
-#                 # Extract food item using AI
-#                 # extracted_food_item = donation_service.extract_food_item(user_message)
-#                 # ai_response = f"Great! I see you want to donate {extracted_food_item}. To help you find the best place to donate, please provide your zip code so I can show you nearby food providers."
-        
-#         return jsonify({
-#             "response": ai_response,
-#             "needs_zip": needs_zip,
-#             "extracted_food_item": extracted_food_item,
-#             "status": "success"
-#         }), 200
-        
-#     except Exception as e:
-#         logging.error(f"Chat error: {e}")
-#         return jsonify({"error": "Failed to process chat message"}), 500
-
-# # ----------------------------
-# # Get Agencies by Zip Code
-# # ----------------------------
-
-# @api_blueprint.route("/donate/agencies", methods=["GET"])
-# def get_agencies_by_zip():
-#     try:
-#         zip_code = request.args.get("zip_code")
-#         if not zip_code:
-#             return jsonify({"error": "Zip code is required"}), 400
-        
-#         # result = donation_service.get_agencies_by_zip(zip_code)
-        
-#         if "error" in result:
-#             return jsonify(result), 400
-        
-#         return jsonify(result), 200
-        
-#     except Exception as e:
-#         logging.error(f"Get agencies error: {e}")
-#         return jsonify({"error": "Failed to get agencies"}), 500
-
-# # ----------------------------
-# # Update Donation
-# # ----------------------------
-
-# @api_blueprint.route("/donate/update", methods=["POST"])
-# def update_donation():
-#     try:
-#         data = request.get_json()
-#         agency_id = data.get("agency_id")
-#         donation_item = data.get("donation_item")
-        
-#         if not agency_id or not donation_item:
-#             return jsonify({"error": "Agency ID and donation item are required"}), 400
-        
-#         # donation_service = DonationService()
-#         # result = donation_service.update_donation(agency_id, donation_item)
-        
-#         if "error" in result:
-#             return jsonify(result), 400
-        
-#         return jsonify(result), 200
-        
-#     except Exception as e:
-#         logging.error(f"Update donation error: {e}")
-#         return jsonify({"error": "Failed to update donation"}), 500
-
-# # ----------------------------
-# # Clear Old Updates (for maintenance)
-# # ----------------------------
-
-# @api_blueprint.route("/donate/clear-old-updates", methods=["POST"])
-# def clear_old_updates():
-#     try:
-#         # donation_service = DonationService()
-#         # success = donation_service.clear_old_updates()
-        
-#         if success:
-#             return jsonify({"message": "Old updates cleared successfully"}), 200
-#         else:
-#             return jsonify({"error": "Failed to clear old updates"}), 500
-            
-#     except Exception as e:
-#         logging.error(f"Clear old updates error: {e}")
-#         return jsonify({"error": "Failed to clear old updates"}), 500
 
 @api_blueprint.route("/donate/chat", methods=["POST"])
 def donate_chat():
@@ -815,17 +625,186 @@ def donate_chat():
 def get_agencies_by_zip():
     try:
         zip_code = request.args.get("zip_code")
-        print(zip_code,food_items)
         if not zip_code:
             return jsonify({"error": "Zip code is required"}), 400
         
-        # result = donation_service.get_agencies_by_zip(zip_code)
+        # Get coordinates for the zip code
+        user_lat, user_lon = get_lat_lon(zip_code)
+        if not user_lat or not user_lon:
+            return jsonify({"error": "Invalid zip code"}), 400
         
-        if "error" in result:
-            return jsonify(result), 400
+        conn = get_connection()
+        cursor = conn.cursor()
         
-        return jsonify(result), 200
+        # Get all agencies with their details
+        cursor.execute("""
+            SELECT a.agency_id, a.name, a.type, a.address, a.phone, a.latitude, a.longitude,
+                   h.day_of_week, h.start_time, h.end_time, h.distribution_model, h.food_format, 
+                   h.appointment_only, h.pantry_requirements, w.service, c.cultures, a.updates
+            FROM agencies a
+            JOIN hours_of_operation h ON a.agency_id = h.agency_id
+            LEFT JOIN wraparound_services w ON a.agency_id = w.agency_id
+            LEFT JOIN cultures_served c ON a.agency_id = c.agency_id
+        """)
+        
+        agencies = []
+        agency_map = {}
+        
+        for row in cursor.fetchall():
+            (agency_id, name, type, address, phone, lat, lon, day_of_week, 
+             start_time, end_time, distribution, food_format, appointment, 
+             pantry_req, wrap_service, culture, updates) = row
+            
+            # Calculate distance
+            distance = calculate_distance(user_lat, user_lon, lat, lon)
+            
+            # Only include agencies within 5 miles
+            if distance <= 5.0:
+                if agency_id not in agency_map:
+                    agency_map[agency_id] = {
+                        "id": agency_id,
+                        "name": name.split(':')[1].strip() if ':' in name else name,
+                        "type": type,
+                        "address": address.replace("Attn:", "").strip() if address and address.startswith("Attn:") else address,
+                        "phone": phone if phone else "Phone not available",
+                        "latitude": lat,
+                        "longitude": lon,
+                        "distance": round(distance, 2),
+                        "day_of_week": day_of_week,
+                        "start_time": start_time,
+                        "end_time": end_time,
+                        "distribution_model": distribution,
+                        "food_format": food_format,
+                        "appointment_only": bool(appointment) if appointment is not None else False,
+                        "pantry_requirements": pantry_req,
+                        "updates": updates,
+                        "wraparound_services": set(),
+                        "cultures_served": set()
+                    }
+                
+                if wrap_service:
+                    agency_map[agency_id]["wraparound_services"].add(wrap_service)
+                if culture:
+                    agency_map[agency_id]["cultures_served"].add(culture)
+        
+        # Convert sets to lists and add to result
+        for agency in agency_map.values():
+            agency["wraparound_services"] = list(agency["wraparound_services"])
+            agency["cultures_served"] = list(agency["cultures_served"])
+            agencies.append(agency)
+        
+        # Sort by distance
+        agencies.sort(key=lambda x: x["distance"])
+        
+        conn.close()
+        
+        return jsonify({
+            "agencies": agencies,
+            "count": len(agencies)
+        }), 200
         
     except Exception as e:
         logging.error(f"Get agencies error: {e}")
         return jsonify({"error": "Failed to get agencies"}), 500
+
+@api_blueprint.route("/donate/update", methods=["POST"])
+def update_donation():
+    try:
+        data = request.get_json()
+        agency_id = data.get("agency_id")
+        food_items = data.get("food_items", [])
+        
+        if not agency_id:
+            return jsonify({"error": "Agency ID is required"}), 400
+        
+        if not food_items:
+            return jsonify({"error": "Food items are required"}), 400
+        
+        # Generate a simple update message using Gemini
+        food_list = ", ".join(food_items)
+        update_prompt = f"""
+        Generate a simple, concise update message for a food donation. 
+        The message should be like "expect 5lb rice here" but for these food items: {food_list}
+        
+        Keep it short and natural. Just return the message, no quotes or extra text.
+        """
+        
+        try:
+            update_response = model.generate_content(update_prompt)
+            update_message = update_response.text.strip()
+        except Exception as e:
+            logging.error(f"Gemini update generation error: {e}")
+            update_message = f"expect {food_list} here"
+        
+        # Get current updates and append new message
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Get current updates
+        cursor.execute("SELECT updates FROM agencies WHERE agency_id = ?", (agency_id,))
+        result = cursor.fetchone()
+        
+        current_updates = result[0] if result and result[0] else ""
+        
+        # Append new update
+        if current_updates:
+            new_updates = current_updates + "; " + update_message
+        else:
+            new_updates = update_message
+        
+        # Update the database with current timestamp
+        current_time = datetime.now()
+        cursor.execute("UPDATE agencies SET updates = ?, last_update_time = ? WHERE agency_id = ?", (new_updates, current_time, agency_id))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Thank you! Your donation of {food_list} has been recorded for this location.",
+            "update_message": update_message
+        }), 200
+        
+    except Exception as e:
+        logging.error(f"Update donation error: {e}")
+        return jsonify({"error": "Failed to update donation"}), 500
+
+def clear_old_updates():
+    """Clear updates that are older than 2 days"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Calculate timestamp for 2 days ago
+        two_days_ago = datetime.now() - timedelta(days=2)
+        
+        # Clear updates older than 2 days
+        cursor.execute("""
+            UPDATE agencies 
+            SET updates = NULL, last_update_time = NULL 
+            WHERE last_update_time < ?
+        """, (two_days_ago,))
+        
+        rows_affected = cursor.rowcount
+        conn.commit()
+        conn.close()
+        
+        logging.info(f"Cleared {rows_affected} old updates")
+        return rows_affected
+        
+    except Exception as e:
+        logging.error(f"Error clearing old updates: {e}")
+        return 0
+
+@api_blueprint.route("/clear-old-updates", methods=["POST"])
+def clear_old_updates_route():
+    """Route to manually clear old updates"""
+    try:
+        rows_cleared = clear_old_updates()
+        return jsonify({
+            "status": "success",
+            "message": f"Cleared {rows_cleared} old updates",
+            "rows_cleared": rows_cleared
+        }), 200
+    except Exception as e:
+        logging.error(f"Clear old updates route error: {e}")
+        return jsonify({"error": "Failed to clear old updates"}), 500

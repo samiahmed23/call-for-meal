@@ -816,7 +816,7 @@
         let chatHistory = [];
         let currentDonationItem = '';
         let currentZipCode = '';
-        let extractedFoodItem = '';
+        let extractedFoodItems = [];
 
         function handleSearch() {
             const searchInput = document.getElementById('donationSearch');
@@ -895,9 +895,9 @@
                     addMessageToChat('assistant', data.response);
                     chatHistory.push({ role: 'assistant', content: data.response });
                     
-                    // Store extracted food item if available
-                    if (data.extracted_food_item) {
-                        extractedFoodItem = data.extracted_food_item;
+                    // Store extracted food items if available
+                    if (data.extracted_food_items && data.extracted_food_items.length > 0) {
+                        extractedFoodItems = data.extracted_food_items;
                     }
                     
                     if (data.needs_zip) {
@@ -950,21 +950,13 @@
                 loadingAgencies.classList.remove('active');
                 
                 if (data.agencies && data.agencies.length > 0) {
-                    // Show note if geocoding failed
-                    if (data.note) {
-                        const noteDiv = document.createElement('div');
-                        noteDiv.style.cssText = 'padding: 10px; background: #FFF3E0; border: 1px solid #FFB74D; border-radius: 5px; margin-bottom: 10px; color: #E65100; font-size: 12px;';
-                        noteDiv.textContent = data.note;
-                        agencyList.appendChild(noteDiv);
-                    }
-                    
                     data.agencies.forEach(agency => {
                         const agencyItem = document.createElement('div');
                         agencyItem.className = 'agency-item';
                         agencyItem.innerHTML = `
                             <div class="agency-name">${agency.name}</div>
                             <div class="agency-details">
-                                ${agency.address} • ${agency.distance}
+                                ${agency.address} • ${agency.distance} miles away
                                 ${agency.phone !== 'Phone not available' ? ' • ' + agency.phone : ''}
                             </div>
                         `;
@@ -972,7 +964,7 @@
                         agencyList.appendChild(agencyItem);
                     });
                 } else {
-                    agencyList.innerHTML = '<div style="padding: 20px; text-align: center; color: #114F50;">No food providers found in your area. Please try a different zip code.</div>';
+                    agencyList.innerHTML = '<div style="padding: 20px; text-align: center; color: #114F50;">No food providers found within 5 miles of your zip code. Please try a different zip code.</div>';
                 }
             })
             .catch(error => {
@@ -983,8 +975,8 @@
         }
 
         function selectAgency(agency) {
-            // Use extracted food item if available, otherwise use current donation item
-            const donationItem = extractedFoodItem || currentDonationItem;
+            // Use extracted food items if available, otherwise use current donation item
+            const foodItems = extractedFoodItems && extractedFoodItems.length > 0 ? extractedFoodItems : [currentDonationItem];
             
             // Update donation in database
             fetch('/donate/update', {
@@ -994,7 +986,7 @@
                 },
                 body: JSON.stringify({
                     agency_id: agency.id,
-                    donation_item: donationItem
+                    food_items: foodItems
                 })
             })
             .then(response => response.json())
