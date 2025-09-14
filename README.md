@@ -51,56 +51,56 @@ Want to run this project locally? Let's get you set up in 5 minutes.
 
 1. Clone the Repository
 
-git clone https://github.com/samiahmed23/call-for-meal
+    git clone https://github.com/samiahmed23/call-for-meal
 
-cd NourishAI
+    cd NourishAI
 
 2. Set Up a Virtual Environment
-## For Windows
-python -m venv venv
+    ## For Windows
+    python -m venv venv
 
-venv\Scripts\activate
+    venv\Scripts\activate
 
-## For macOS/Linux
-python3 -m venv venv
+    ## For macOS/Linux
+    python3 -m venv venv
 
-source venv/bin/activate
+    source venv/bin/activate
 
 3. Install Dependencies
 
-We've listed everything you need in requirements.txt.
+    We've listed everything you need in requirements.txt.
 
-*pip install -r requirements.txt*
+    *pip install -r requirements.txt*
 
 4. CRITICAL: Configure Your API Keys
 
-**This is the most important step.** Our app relies on external services.
+    **This is the most important step.** Our app relies on external services.
 
-Create a file named *.env* in the root of the project directory. Copy the contents of .env.example (if one exists) or create it from scratch.
+    Create a file named *.env* in the root of the project directory. Copy the contents of .env.example (if one exists) or create it from scratch.
 
-Your .env file must look like this:
+    Your .env file must look like this:
 
-## Get from Google Cloud Console (enable Geocoding API)
-GOOGLE_MAPS_API_KEY="AIza..."
+    ## Get from Google Cloud Console (enable Geocoding API)
+    GOOGLE_MAPS_API_KEY="AIza..."
 
-## Get from Google AI Studio
-GEMINI_API_KEY="AIza..."
+    ## Get from Google AI Studio
+    GEMINI_API_KEY="AIza..."
 
-## Get from your Stripe Dashboard (use test keys!)
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PUBLIC_KEY="pk_test_..."
+    ## Get from your Stripe Dashboard (use test keys!)
+    STRIPE_SECRET_KEY="sk_test_..."
+    STRIPE_PUBLIC_KEY="pk_test_..."
 
-## Get from your SQLite Cloud Dashboard
-SQLITECLOUD_CONNECTION_STRING="sqlitecloud://user:password@hostname.sqlite.cloud:port/database"
+    ## Get from your SQLite Cloud Dashboard
+    SQLITECLOUD_CONNECTION_STRING="sqlitecloud://user:password@hostname.sqlite.cloud:port/database"
 
 
-**Where to Get Your Keys ?**
+    **Where to Get Your Keys ?**
 
-*Google Maps & Gemini:* Go to Google Cloud Console. You will need to create a project, enable the "Geocoding API" for maps, and get a Gemini key from the Google AI Studio.
+    *Google Maps & Gemini:* Go to Google Cloud Console. You will need to create a project, enable the "Geocoding API" for maps, and get a Gemini key from the Google AI Studio.
 
-*Stripe:* Create a free account at Stripe.com. Your test keys (pk_test and sk_test) are available in the "Developers" section of the dashboard.
+    *Stripe:* Create a free account at Stripe.com. Your test keys (pk_test and sk_test) are available in the "Developers" section of the dashboard.
 
-*SQLite Cloud:* Sign up at SQLite.cloud and create a new database. The full connection string is provided on your database dashboard.
+    *SQLite Cloud:* Sign up at SQLite.cloud and create a new database. The full connection string is provided on your database dashboard.
 
 5. Run the Application
 
@@ -112,10 +112,10 @@ Navigate to http://127.0.0.1:5000/ in your browser and you should be live!
 
 This was an amazing hackathon build, but we're just getting started. Here's where we could take NourishAI next:
 
-Live Inventory Management: Allow pantries to log in and manage a simple inventory, giving donors an even clearer picture of their needs.
+**Live Inventory Management:** Allow pantries to log in and manage a simple inventory, giving donors an even clearer picture of their needs.
 
-SMS Notifications: Alert subscribed users when a local pantry has an urgent need.
+**SMS Notifications:** Alert subscribed users when a local pantry has an urgent need.
 
-Gamification: Create a points system for donations to encourage community engagement.
+**Gamification:** Create a points system for donations to encourage community engagement.
 
 Built with ❤️ for the community. Let's nourish it together.
