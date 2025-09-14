@@ -255,14 +255,30 @@ def search_agencies():
     # geolocator = Nominatim(user_agent="food_assistance_locator")
     # location = geolocator.geocode(address, country_codes="us") # Limit to US locations
     
-    if address:
-         # Convert address(zipcode to be precise) to lat/lon 
-        geolocator = Nominatim(user_agent="food_assistance_locator")
-        location = geolocator.geocode(address,  country_codes="us") # Limit to US locations 
+    
+    # Now we need to convert the address to lat/lon using geopy or another geocoding service
+    # if address:
+    #      # Convert address(zipcode to be precise) to lat/lon 
+    #     geolocator = Nominatim(user_agent="food_assistance_locator")
+    #     location = geolocator.geocode(address,  country_codes="us") # Limit to US locations 
         
-        if not location:
-            return jsonify({"error": "Location not found"}), 404
-        user_coords = (location.latitude, location.longitude)
+    #     if not location:
+    #         return jsonify({"error": "Location not found"}), 404
+    #     user_coords = (location.latitude, location.longitude)
+    
+    if address:
+        try:
+            resp = requests.get(f"https://api.zippopotam.us/us/{address}", timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                place = data["places"][0]
+                lat = float(place["latitude"])
+                lng = float(place["longitude"])
+                user_coords = (lat, lng)
+            else:
+                return jsonify({"error": "Location not found"}), 404
+        except requests.RequestException:
+            return jsonify({"error": "Geocoding service unavailable"}), 503
     elif lat and lng: # If user gave the site their current location
         user_coords = (float(lat), float(lng))    
     else:
