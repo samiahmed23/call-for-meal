@@ -108,6 +108,8 @@ flask run
 
 Navigate to http://127.0.0.1:5000/ in your browser and you should be live!
 
+Hosted website: https://call-for-meal.onrender.com/
+
 ## 🚀 What's Next? (Future Ideas)
 
 This was an amazing hackathon build, but we're just getting started. Here's where we could take NourishAI next:
