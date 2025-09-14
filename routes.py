@@ -43,17 +43,14 @@ def get_lat_lon_by_address(address):
             if resp.status_code == 200:
                 data = resp.json()
                 place = data["places"][0]
-                lat = float(place["latitude"])
-                lng = float(place["longitude"])
-                user_coords = (lat, lng)
+                lati = float(place["latitude"])
+                lngi = float(place["longitude"])
+                user_coords = (lati, lngi)
                 return user_coords
             else:
                 return jsonify({"error": "Location not found"}), 404
         except requests.RequestException:
             return jsonify({"error": "Geocoding service unavailable"}), 503
-    elif lat and lng: # If user gave the site their current location
-        user_coords = (float(lat), float(lng))  
-        return user_coords
     else:
         return jsonify({"error": "Address or coordinates are required"}), 400
 
@@ -272,7 +269,14 @@ def search_agencies():
     # Clear old updates automatically when searching
     clear_old_updates()
    
-    user_coords = get_lat_lon_by_address(address)
+    if address:
+       user_coords = get_lat_lon_by_address(address)
+    
+    elif lat and lng: # If user gave the site their current location
+        user_coords = (float(lat), float(lng))  
+    else:
+        return jsonify({"error": "Address or coordinates are required"}), 400
+   
     conn = get_connection()
     cursor = conn.cursor()
 
