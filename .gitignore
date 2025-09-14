@@ -2,5 +2,7 @@ data/
 config.py
 myenv/
 pyvenv.cfg
-__pycache__/
+_pycache_/
 *.pyc
+venv1/
+.env

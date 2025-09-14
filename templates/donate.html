@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Food - NourishAI</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0f9f7 100%);
+            min-height: 100vh;
+            color: #0C4058;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            border-bottom: 2px solid #5DBA68;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(12, 64, 88, 0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5DBA68;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: #29A296;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #0C4058;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 60px 0;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0C4058;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: #114F50;
+            margin-bottom: 50px;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(12, 64, 88, 0.1);
+            margin-bottom: 60px;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-section.expanded {
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .search-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #0C4058;
+            margin-bottom: 20px;
+        }
+
+        .search-description {
+            font-size: 16px;
+            color: #114F50;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 60px 18px 20px;
+            border: 2px solid rgba(93, 186, 104, 0.3);
+            border-radius: 50px;
+            font-size: 16px;
+            background: white;
+            color: #0C4058;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #5DBA68;
+            box-shadow: 0 0 0 4px rgba(93, 186, 104, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #29A296;
+            font-weight: 400;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+
+        .search-button:hover {
+            transform: translateY(-50%) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: none;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chat-container.active {
+            display: block;
+        }
+
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fffe;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #0C4058;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background: #f0f9f7;
+            color: #5DBA68;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(93, 186, 104, 0.3);
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            color: #0C4058;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #5DBA68;
+        }
+
+        .chat-send-button {
+            background: transparent;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .chat-send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Agency Selection */
+        .agency-selection {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .agency-selection.active {
+            display: block;
+        }
+
+        .agency-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+            border-radius: 10px;
+            background: white;
+        }
+
+        .agency-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(93, 186, 104, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .agency-item:hover {
+            background: #f8fffe;
+        }
+
+        .agency-item:last-child {
+            border-bottom: none;
+        }
+
+        .agency-name {
+            font-weight: 600;
+            color: #0C4058;
+            margin-bottom: 5px;
+        }
+
+        .agency-details {
+            font-size: 12px;
+            color: #114F50;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #5DBA68;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(93, 186, 104, 0.3);
+            border-radius: 50%;
+            border-top-color: #5DBA68;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Food Types Section */
+        .food-types-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #0C4058;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .food-category {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(12, 64, 88, 0.1);
+            border: 1px solid rgba(93, 186, 104, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .food-category:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0C4058;
+        }
+
+        .category-description {
+            font-size: 14px;
+            color: #114F50;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .food-items {
+            list-style: none;
+        }
+
+        .food-items li {
+            padding: 8px 0;
+            color: #0C4058;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(93, 186, 104, 0.1);
+        }
+
+        .food-items li:last-child {
+            border-bottom: none;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: linear-gradient(135deg, #f0f9f7 0%, #e8f5f3 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border-left: 4px solid #5DBA68;
+            margin-bottom: 40px;
+        }
+
+        .info-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0C4058;
+            margin-bottom: 20px;
+        }
+
+        .info-content {
+            color: #114F50;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0C4058 0%, #114F50 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .back-button {
+                font-size: 14px;
+                left: 15px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+                margin-bottom: 40px;
+            }
+
+            .search-section {
+                padding: 30px 20px;
+                margin-bottom: 40px;
+            }
+
+            .search-title {
+                font-size: 24px;
+            }
+
+            .search-input {
+                padding: 16px 50px 16px 18px;
+                font-size: 16px;
+            }
+
+            .search-button {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .food-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .food-category {
+                padding: 25px;
+            }
+
+            .category-header {
+                gap: 12px;
+            }
+
+            .category-icon {
+                font-size: 28px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .category-title {
+                font-size: 18px;
+            }
+
+            .info-section {
+                padding: 30px 20px;
+            }
+
+            .info-title {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .search-section {
+                padding: 25px 15px;
+            }
+
+            .search-title {
+                font-size: 22px;
+            }
+
+            .search-input {
+                padding: 14px 45px 14px 16px;
+                font-size: 15px;
+            }
+
+            .search-button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .food-category {
+                padding: 20px;
+            }
+
+            .category-icon {
+                font-size: 24px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .category-title {
+                font-size: 16px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .fade-in-up-delay {
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .fade-in-up-delay-2 {
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="/" class="back-button">
+                ← Back to Home
+            </a>
+            <h1 class="page-title">Donate Food</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section fade-in-up">
+                <h1 class="hero-title">Make a Difference</h1>
+                <p class="hero-subtitle">
+                    Your food donations help feed families in need. Find out what's most needed in your community and make a meaningful contribution.
+                </p>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section fade-in-up-delay" id="searchSection">
+                <div class="search-container" id="searchContainer">
+                    <h2 class="search-title">What would you like to donate?</h2>
+                    <p class="search-description">
+                        Tell us what food items you have available, and we'll help you find the best way to donate them to those in need.
+                    </p>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="What would you like to donate?" id="donationSearch">
+                        <button class="search-button" onclick="handleSearch()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Google-gemini-icon.svg" 
+                                 alt="Google Gemini" 
+                                 width="20" 
+                                 height="20" 
+                                 style="filter: brightness(0) invert(1);">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Interface -->
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message assistant">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                Hi! I'm here to help you donate food. What would you like to donate today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                        <button class="chat-send-button" id="chatSendButton" onclick="sendMessage()">
+                            <img width="60" height="60" src="https://img.icons8.com/color/48/gemini-ai.png" alt="gemini-ai"/>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agency Selection -->
+                <div class="agency-selection" id="agencySelection">
+                    <h3 style="color: #0C4058; margin-bottom: 15px;">Select a food provider near you:</h3>
+                    <div class="loading" id="loadingAgencies">
+                        <div class="loading-spinner"></div>
+                        <p>Finding nearby food providers...</p>
+                    </div>
+                    <div class="agency-list" id="agencyList"></div>
+                </div>
+            </section>
+
+            <!-- Food Types Section -->
+            <section class="food-types-section fade-in-up-delay-2">
+                <h2 class="section-title">Most Needed Food Items</h2>
+                
+                <div class="food-grid">
+                    <div class="food-category">
+                        <div class="category-header">
+                            <div class="category-icon">🥫</div>
+                            <h3 class="category-title">Non-Perishable Foods</h3>
+                        </div>
+                        <p class="category-description">These items have long shelf lives and are always in high demand.</p>
+                        <ul class="food-items">
+                            <li>Canned vegetables and fruits</li>
+                            <li>Canned proteins (tuna, chicken, beans)</li>
+                            <li>Rice and pasta</li>
+                            <li>Cereal and oatmeal</li>
+                            <li>Peanut butter and jelly</li>
+                            <li>Soup and broth</li>
+                        </ul>
+                    </div>
+
+                    <div class="food-category">
+                        <div class="category-header">
+                            <div class="category-icon">🥛</div>
+                            <h3 class="category-title">Dairy & Protein</h3>
+                        </div>
+                        <p class="category-description">Essential for nutrition, especially for families with children.</p>
+                        <ul class="food-items">
+                            <li>Milk (fresh or shelf-stable)</li>
+                            <li>Cheese and yogurt</li>
+                            <li>Eggs</li>
+                            <li>Ground meat and poultry</li>
+                            <li>Fish and seafood</li>
+                            <li>Plant-based proteins</li>
+                        </ul>
+                    </div>
+
+                    <div class="food-category">
+                        <div class="category-header">
+                            <div class="category-icon">🍎</div>
+                            <h3 class="category-title">Fresh Produce</h3>
+                        </div>
+                        <p class="category-description">Fresh fruits and vegetables provide essential vitamins and nutrients.</p>
+                        <ul class="food-items">
+                            <li>Apples, bananas, oranges</li>
+                            <li>Leafy greens and lettuce</li>
+                            <li>Carrots, potatoes, onions</li>
+                            <li>Tomatoes and peppers</li>
+                            <li>Berries and seasonal fruits</li>
+                            <li>Fresh herbs</li>
+                        </ul>
+                    </div>
+
+                    <div class="food-category">
+                        <div class="category-header">
+                            <div class="category-icon">👶</div>
+                            <h3 class="category-title">Baby & Special Needs</h3>
+                        </div>
+                        <p class="category-description">Specialized items that are often in short supply.</p>
+                        <ul class="food-items">
+                            <li>Baby formula and food</li>
+                            <li>Diapers and wipes</li>
+                            <li>Gluten-free products</li>
+                            <li>Low-sodium options</li>
+                            <li>Diabetic-friendly foods</li>
+                            <li>Cultural specialty items</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Info Section -->
+            <section class="info-section fade-in-up-delay-2">
+                <h2 class="info-title">💡 Donation Tips</h2>
+                <div class="info-content">
+                    <p><strong>Check expiration dates:</strong> Only donate items that are within their expiration date or have reasonable shelf life remaining.</p>
+                    <br>
+                    <p><strong>Consider dietary needs:</strong> Many families have specific dietary requirements. Items like gluten-free, low-sodium, or culturally appropriate foods are especially valuable.</p>
+                    <br>
+                    <p><strong>Think about families:</strong> Items that can feed multiple people or be easily shared are particularly helpful for larger families.</p>
+                    <br>
+                    <p><strong>Contact first:</strong> Before making a large donation, consider calling ahead to confirm what items are most needed at that time.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">
+                © 2024 NourishAI. Making food accessible to everyone, everywhere.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let chatHistory = [];
+        let currentDonationItem = '';
+        let currentZipCode = '';
+        let extractedFoodItems = [];
+
+        function handleSearch() {
+            const searchInput = document.getElementById('donationSearch');
+            const searchTerm = searchInput.value.trim();
+            
+            if (searchTerm) {
+                // Transform to chat interface
+                showChatInterface();
+                // Send the initial message
+                sendInitialMessage(searchTerm);
+            } else {
+                alert('Please enter what you would like to donate.');
+            }
+        }
+
+        function showChatInterface() {
+            const searchContainer = document.getElementById('searchContainer');
+            const chatContainer = document.getElementById('chatContainer');
+            const searchSection = document.getElementById('searchSection');
+            
+            searchContainer.style.display = 'none';
+            chatContainer.classList.add('active');
+            searchSection.classList.add('expanded');
+        }
+
+        function sendInitialMessage(message) {
+            addMessageToChat('user', message);
+            chatHistory.push({ role: 'user', content: message });
+            currentDonationItem = message;
+            
+            // Send to AI
+            sendToAI(message);
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                addMessageToChat('user', message);
+                chatHistory.push({ role: 'user', content: message });
+                chatInput.value = '';
+                
+                // Check if it's a zip code
+                if (isZipCode(message)) {
+                    currentZipCode = message;
+                    loadAgencies(message);
+                } else {
+                    sendToAI(message);
+                }
+            }
+        }
+
+        function isZipCode(text) {
+            // Simple zip code validation (5 digits)
+            return /^\d{5}$/.test(text);
+        }
+
+        function sendToAI(message) {
+            const chatSendButton = document.getElementById('chatSendButton');
+            chatSendButton.disabled = true;
+            
+            fetch('/donate/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    history: chatHistory
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    addMessageToChat('assistant', data.response);
+                    chatHistory.push({ role: 'assistant', content: data.response });
+                    
+                    // Store extracted food items if available
+                    if (data.extracted_food_items && data.extracted_food_items.length > 0) {
+                        extractedFoodItems = data.extracted_food_items;
+                    }
+                    
+                    if (data.needs_zip) {
+                        showAgencySelection();
+                    }
+                } else {
+                    const errorMsg = data.error || 'Sorry, I encountered an error. Please try again.';
+                    addMessageToChat('assistant', errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, I encountered a network error. Please check your connection and try again.');
+            })
+            .finally(() => {
+                chatSendButton.disabled = false;
+            });
+        }
+
+        function addMessageToChat(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const avatar = role === 'user' ? '👤' : '🤖';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showAgencySelection() {
+            const agencySelection = document.getElementById('agencySelection');
+            agencySelection.classList.add('active');
+        }
+
+        function loadAgencies(zipCode) {
+            const loadingAgencies = document.getElementById('loadingAgencies');
+            const agencyList = document.getElementById('agencyList');
+            
+            loadingAgencies.classList.add('active');
+            agencyList.innerHTML = '';
+            
+            fetch(`/donate/agencies?zip_code=${zipCode}`)
+            .then(response => response.json())
+            .then(data => {
+                loadingAgencies.classList.remove('active');
+                
+                if (data.agencies && data.agencies.length > 0) {
+                    data.agencies.forEach(agency => {
+                        const agencyItem = document.createElement('div');
+                        agencyItem.className = 'agency-item';
+                        agencyItem.innerHTML = `
+                            <div class="agency-name">${agency.name}</div>
+                            <div class="agency-details">
+                                ${agency.address} • ${agency.distance} miles away
+                                ${agency.phone !== 'Phone not available' ? ' • ' + agency.phone : ''}
+                            </div>
+                        `;
+                        agencyItem.onclick = () => selectAgency(agency);
+                        agencyList.appendChild(agencyItem);
+                    });
+                } else {
+                    agencyList.innerHTML = '<div style="padding: 20px; text-align: center; color: #114F50;">No food providers found within 5 miles of your zip code. Please try a different zip code.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loadingAgencies.classList.remove('active');
+                agencyList.innerHTML = '<div style="padding: 20px; text-align: center; color: #FF6B35;">Error loading food providers. Please try again.</div>';
+            });
+        }
+
+        function selectAgency(agency) {
+            // Use extracted food items if available, otherwise use current donation item
+            const foodItems = extractedFoodItems && extractedFoodItems.length > 0 ? extractedFoodItems : [currentDonationItem];
+            
+            // Update donation in database
+            fetch('/donate/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    agency_id: agency.id,
+                    food_items: foodItems
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    addMessageToChat('assistant', data.message);
+                    chatHistory.push({ role: 'assistant', content: data.message });
+                    
+                    // Hide agency selection
+                    const agencySelection = document.getElementById('agencySelection');
+                    agencySelection.classList.remove('active');
+                } else {
+                    addMessageToChat('assistant', 'Sorry, there was an error processing your donation. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, there was an error processing your donation. Please try again.');
+            });
+        }
+
+        // Event listeners
+        document.getElementById('donationSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+

@@ -17,28 +17,65 @@
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
-      background: #f9f9f9;
-      color: #333;
+      background: linear-gradient(135deg, #f8fffe 0%, #f0f9f7 100%);
+      color: #0C4058;
     }
 
     header {
-      background-color: #ffffff;
-      border-bottom: 1px solid #ddd;
-      padding: 20px 40px;
-      text-align: center;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+      border-bottom: 2px solid #5DBA68;
+      padding: 15px 20px;
+      box-shadow: 0 2px 10px rgba(12, 64, 88, 0.1);
+      position: relative;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .header-logo {
+    .back-button {
       position: absolute;
-      top: 10px;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #5DBA68;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    .back-button:hover {
+      color: #29A296;
+    }
+
+    .language-selector {
+      position: absolute;
       right: 20px;
-      height: 50px;
-      width: auto;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .language-selector label {
+      font-size: 12px;
+      color: #0C4058;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .language-selector select {
+      padding: 6px 10px;
+      border: 1px solid rgba(93, 186, 104, 0.3);
+      border-radius: 6px;
+      background: white;
+      color: #0C4058;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .language-selector select:focus {
+      outline: none;
+      border-color: #5DBA68;
+      box-shadow: 0 0 0 2px rgba(93, 186, 104, 0.1);
     }
     
 
@@ -46,29 +83,40 @@
       display: flex;
       padding: 40px;
       gap: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .controls {
       width: 30%;
-      background-color: #fff;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
       padding: 24px;
-      border-radius: 8px;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(12, 64, 88, 0.1);
+      border: 1px solid rgba(93, 186, 104, 0.2);
     }
 
     .controls label {
       display: block;
       margin-top: 20px;
       font-weight: 600;
+      color: #0C4058;
     }
 
     .controls input, .controls button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 6px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      border-radius: 8px;
+      border: 1px solid rgba(93, 186, 104, 0.3);
       font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .controls input:focus {
+      outline: none;
+      border-color: #5DBA68;
+      box-shadow: 0 0 0 3px rgba(93, 186, 104, 0.1);
     }
 
     input:invalid {
@@ -77,16 +125,18 @@
     
 
     .controls button {
-      background-color: #007BFF;
+      background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
       color: white;
       border: none;
       cursor: pointer;
       margin-top: 16px;
       font-weight: 600;
+      box-shadow: 0 4px 15px rgba(93, 186, 104, 0.3);
     }
 
     .controls button:hover {
-      background-color: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(93, 186, 104, 0.4);
     }
 
     .map-container {
@@ -97,16 +147,18 @@
     #map {
       width: 100%;
       height: 100%;
-      border-radius: 8px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(12, 64, 88, 0.1);
     }
 
     .agent-info {
       margin-top: 30px;
       font-size: 14px;
-      background: #eef4ff;
+      background: linear-gradient(135deg, #f0f9f7 0%, #e8f5f3 100%);
       padding: 15px;
-      border-left: 4px solid #007BFF;
-      border-radius: 6px;
+      border-left: 4px solid #5DBA68;
+      border-radius: 8px;
+      color: #0C4058;
     }
 
     .vapi-buttons {
@@ -144,9 +196,8 @@
     
     .toggle-label {
       font-size: 16px;
-
       font-weight: 500;
-      color: #333;
+      color: #0C4058;
     }
     
     .switch {
@@ -187,7 +238,7 @@
     }
     
     input:checked + .slider {
-      background-color: #007BFF;
+      background-color: #5DBA68;
     }
     
     input:checked + .slider:before {
@@ -214,10 +265,132 @@
     }
     
     .fancy-dropdown:focus {
-      border-color: #007BFF;
+      border-color: #5DBA68;
       outline: none;
+      box-shadow: 0 0 0 3px rgba(93, 186, 104, 0.1);
     }
-    
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+        padding: 20px;
+        gap: 20px;
+      }
+
+      .map-container {
+        width: 100%;
+        height: 50vh;
+        order: 1;
+      }
+
+      .controls {
+        width: 100%;
+        order: 2;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(12, 64, 88, 0.1);
+        border: 1px solid rgba(93, 186, 104, 0.2);
+      }
+
+      .back-button {
+        font-size: 14px;
+        left: 15px;
+      }
+
+      .language-selector {
+        right: 15px;
+      }
+
+      .language-selector label {
+        font-size: 11px;
+      }
+
+      .language-selector select {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+
+      .controls input, .controls button {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+      }
+
+      .controls label {
+        font-size: 14px;
+        margin-top: 15px;
+      }
+
+      .controls button {
+        margin-top: 20px;
+        padding: 15px;
+        font-size: 16px;
+      }
+
+      .toggle-container {
+        margin-top: 15px;
+      }
+
+      .toggle-label {
+        font-size: 14px;
+      }
+    }
+
+    /* Extra small mobile devices */
+    @media (max-width: 480px) {
+      .content {
+        padding: 15px;
+      }
+
+      .back-button {
+        font-size: 12px;
+        left: 10px;
+      }
+
+      .language-selector {
+        right: 10px;
+      }
+
+      .language-selector label {
+        font-size: 10px;
+      }
+
+      .language-selector select {
+        font-size: 10px;
+        padding: 3px 6px;
+      }
+
+      .controls {
+        padding: 15px;
+      }
+
+      .map-container {
+        height: 45vh;
+      }
+    }
+
+    /* Google Maps Info Window Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .gm-style-iw {
+        max-width: 280px !important;
+      }
+      
+      .gm-style-iw-d {
+        max-width: 280px !important;
+        overflow: hidden !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .gm-style-iw {
+        max-width: 250px !important;
+      }
+      
+      .gm-style-iw-d {
+        max-width: 250px !important;
+        overflow: hidden !important;
+      }
+    }
 
   </style>
 </head>
@@ -225,18 +398,18 @@
 <body>
 
   <header>
-    <h1>Food Assistance Locator <small><i> - By NourishAI 🤖</i></small></h1> 
-
-    <label for="languageSelector" style="position: absolute; left: 20px; top: 3px; font-size: 15px; font-weight: 500;"><small><i>Language:</i></small></label>
-    <div style="position: absolute; left: 20px; top: 20px;">
+    <a href="/" class="back-button">
+      ← Back to Home
+    </a>
+    
+    <div class="language-selector">
+      <label for="languageSelector">Language:</label>
       <select id="languageSelector" onchange="setLanguage(this.value)">
-      <option value="en">English</option>
-      <option value="es">Español</option>
-      <option value="ar">العربية</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="ar">العربية</option>
       </select>
     </div>
-
-    <img src="{{ url_for('static', filename='CAFB_Logo.svg') }}" alt="CAFB Logo" class="header-logo">
   </header>
 
   <div class="content">
@@ -396,23 +569,89 @@
           map.setCenter({ lat: data[0].latitude, lng: data[0].longitude });
 
           data.forEach(site => {
+            // Use bright yellow with pulsing animation for agencies with updates, default red for others
+            const hasUpdates = site.updates && site.updates.trim() !== '';
+            const markerIcon = hasUpdates ? 
+              'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png' : 
+              'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+            
             const marker = new google.maps.Marker({
               position: { lat: site.latitude, lng: site.longitude },
               map: map,
               title: site.name,
-              phone: site.phone
+              phone: site.phone,
+              icon: markerIcon,
+              animation: hasUpdates ? google.maps.Animation.BOUNCE : null
             });
 
+            // Stop bouncing animation after 3 seconds for markers with updates
+            if (hasUpdates) {
+              setTimeout(() => {
+                marker.setAnimation(null);
+              }, 3000);
+            }
+
+            // Modern info window content
+            const updatesInfo = hasUpdates ? 
+              `<div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; padding: 12px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
+                  <span style="font-size: 16px;">📢</span>
+                  <span>${site.updates}</span>
+                </div>
+              </div>` : '';
+            
             const info = new google.maps.InfoWindow({
-              content: `<strong>${site.name}</strong><br><br>
-              <strong>Address:</strong> ${site.address}<br>
-              <strong>Distance:</strong> ${site.distance} mi away <br>
-              <strong>Phone:</strong> ${site.phone}<br>
-              <strong>Hours of Operation:</strong> ${site.hours}<br>  
-              <strong>Appointment:</strong> ${site.appointment}<br>
-              <strong>Prepared Meals:</strong> ${site.Prepared_meals}<br>
-              <strong>Home Delivery:</strong> ${site.home_delivery}<br>
-              <button onclick="navigateTo(${site.latitude}, ${site.longitude})">Get Directions</button>`
+              content: `
+                <div style="font-family: 'Inter', sans-serif; max-width: 300px; line-height: 1.5;">
+                  <h3 style="margin: 0 0 16px 0; color: #0C4058; font-size: 18px; font-weight: 600; border-bottom: 2px solid #5DBA68; padding-bottom: 8px;">
+                    ${site.name}
+                  </h3>
+                  
+                  ${updatesInfo}
+                  
+                  <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📍</span>
+                      <span style="color: #0C4058;">${site.address}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📏</span>
+                      <span style="color: #0C4058;">${site.distance} mi away</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📞</span>
+                      <span style="color: #0C4058;">${site.phone}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🕒</span>
+                      <span style="color: #0C4058;">${site.hours}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📋</span>
+                      <span style="color: #0C4058;">${site.appointment}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🍽️</span>
+                      <span style="color: #0C4058;">${site.Prepared_meals}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🚚</span>
+                      <span style="color: #0C4058;">${site.home_delivery}</span>
+                    </div>
+                  </div>
+                  
+                  <button onclick="navigateTo(${site.latitude}, ${site.longitude})" 
+                          style="width: 100%; background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; margin-top: 16px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(93, 186, 104, 0.3);">
+                    🗺️ Get Directions
+                  </button>
+                </div>
+              `
             });
 
             marker.addListener("click", () => info.open(map, marker));
@@ -440,23 +679,89 @@
           map.setCenter(originCoords);
 
           data.forEach(site => {
+            // Use bright yellow with pulsing animation for agencies with updates, default red for others
+            const hasUpdates = site.updates && site.updates.trim() !== '';
+            const markerIcon = hasUpdates ? 
+              'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png' : 
+              'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+            
             const marker = new google.maps.Marker({
               position: { lat: site.latitude, lng: site.longitude },
               map: map,
               title: site.name,
-              phone: site.phone
+              phone: site.phone,
+              icon: markerIcon,
+              animation: hasUpdates ? google.maps.Animation.BOUNCE : null
             });
 
+            // Stop bouncing animation after 3 seconds for markers with updates
+            if (hasUpdates) {
+              setTimeout(() => {
+                marker.setAnimation(null);
+              }, 3000);
+            }
+
+            // Modern info window content
+            const updatesInfo = hasUpdates ? 
+              `<div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; padding: 12px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
+                  <span style="font-size: 16px;">📢</span>
+                  <span>${site.updates}</span>
+                </div>
+              </div>` : '';
+            
             const info = new google.maps.InfoWindow({
-              content: `<strong>${site.name}</strong><br><br>
-              <strong>Address:</strong> ${site.address}<br>
-              <strong>Distance:</strong> ${site.distance} mi away <br>
-              <strong>Phone:</strong> ${site.phone}<br>
-              <strong>Hours of Operation:</strong> ${site.hours}<br>
-              <strong>Appointment:</strong> ${site.appointment}<br>
-              <strong>Prepared Meals:</strong> ${site.Prepared_meals}<br>
-              <strong>Home Delivery:</strong> ${site.home_delivery}<br>
-              <button onclick="navigateTo(${site.latitude}, ${site.longitude})">Get Directions</button>`
+              content: `
+                <div style="font-family: 'Inter', sans-serif; max-width: 300px; line-height: 1.5;">
+                  <h3 style="margin: 0 0 16px 0; color: #0C4058; font-size: 18px; font-weight: 600; border-bottom: 2px solid #5DBA68; padding-bottom: 8px;">
+                    ${site.name}
+                  </h3>
+                  
+                  ${updatesInfo}
+                  
+                  <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📍</span>
+                      <span style="color: #0C4058;">${site.address}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📏</span>
+                      <span style="color: #0C4058;">${site.distance} mi away</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📞</span>
+                      <span style="color: #0C4058;">${site.phone}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🕒</span>
+                      <span style="color: #0C4058;">${site.hours}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">📋</span>
+                      <span style="color: #0C4058;">${site.appointment}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🍽️</span>
+                      <span style="color: #0C4058;">${site.Prepared_meals}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="color: #5DBA68; font-weight: 600; min-width: 60px;">🚚</span>
+                      <span style="color: #0C4058;">${site.home_delivery}</span>
+                    </div>
+                  </div>
+                  
+                  <button onclick="navigateTo(${site.latitude}, ${site.longitude})" 
+                          style="width: 100%; background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; margin-top: 16px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(93, 186, 104, 0.3);">
+                    🗺️ Get Directions
+                  </button>
+                </div>
+              `
             });
 
             marker.addListener("click", () => info.open(map, marker));
@@ -547,8 +852,11 @@
       document.querySelector('button[onclick="search()"]').textContent = t.searchZip;
       document.querySelector('button[onclick="searchFromCurrentLocation()"]').textContent = t.searchCurrent;
   
-      // RTL Support
-      document.body.dir = lang === "ar" ? "rtl" : "ltr";
+      // RTL Support - Only apply to controls panel
+      const controlsPanel = document.querySelector('.controls');
+      if (controlsPanel) {
+        controlsPanel.dir = lang === "ar" ? "rtl" : "ltr";
+      }
     }
       
 
