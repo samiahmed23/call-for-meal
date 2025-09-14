@@ -100,6 +100,13 @@
             box-shadow: 0 10px 40px rgba(12, 64, 88, 0.1);
             margin-bottom: 60px;
             border: 1px solid rgba(93, 186, 104, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-section.expanded {
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .search-container {
@@ -154,7 +161,7 @@
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            background: transparent;
             color: white;
             border: none;
             border-radius: 50px;
@@ -163,12 +170,201 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(93, 186, 104, 0.3);
+            box-shadow: none;
         }
 
         .search-button:hover {
             transform: translateY(-50%) translateY(-2px);
-            box-shadow: 0 6px 20px rgba(93, 186, 104, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: none;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chat-container.active {
+            display: block;
+        }
+
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fffe;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #0C4058;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #5DBA68 0%, #66B65D 100%);
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background: #f0f9f7;
+            color: #5DBA68;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(93, 186, 104, 0.3);
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            color: #0C4058;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #5DBA68;
+        }
+
+        .chat-send-button {
+            background: transparent;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .chat-send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Agency Selection */
+        .agency-selection {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .agency-selection.active {
+            display: block;
+        }
+
+        .agency-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(93, 186, 104, 0.2);
+            border-radius: 10px;
+            background: white;
+        }
+
+        .agency-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(93, 186, 104, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .agency-item:hover {
+            background: #f8fffe;
+        }
+
+        .agency-item:last-child {
+            border-bottom: none;
+        }
+
+        .agency-name {
+            font-weight: 600;
+            color: #0C4058;
+            margin-bottom: 5px;
+        }
+
+        .agency-details {
+            font-size: 12px;
+            color: #114F50;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #5DBA68;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(93, 186, 104, 0.3);
+            border-radius: 50%;
+            border-top-color: #5DBA68;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Food Types Section */
@@ -473,16 +669,50 @@
             </section>
 
             <!-- Search Section -->
-            <section class="search-section fade-in-up-delay">
-                <div class="search-container">
+            <section class="search-section fade-in-up-delay" id="searchSection">
+                <div class="search-container" id="searchContainer">
                     <h2 class="search-title">What would you like to donate?</h2>
                     <p class="search-description">
                         Tell us what food items you have available, and we'll help you find the best way to donate them to those in need.
                     </p>
                     <div class="search-bar">
                         <input type="text" class="search-input" placeholder="What would you like to donate?" id="donationSearch">
-                        <button class="search-button" onclick="handleSearch()">Search</button>
+                        <button class="search-button" onclick="handleSearch()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Google-gemini-icon.svg" 
+                                 alt="Google Gemini" 
+                                 width="20" 
+                                 height="20" 
+                                 style="filter: brightness(0) invert(1);">
+                        </button>
                     </div>
+                </div>
+
+                <!-- Chat Interface -->
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message assistant">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                Hi! I'm here to help you donate food. What would you like to donate today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                        <button class="chat-send-button" id="chatSendButton" onclick="sendMessage()">
+                            <img width="60" height="60" src="https://img.icons8.com/color/48/gemini-ai.png" alt="gemini-ai"/>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agency Selection -->
+                <div class="agency-selection" id="agencySelection">
+                    <h3 style="color: #0C4058; margin-bottom: 15px;">Select a food provider near you:</h3>
+                    <div class="loading" id="loadingAgencies">
+                        <div class="loading-spinner"></div>
+                        <p>Finding nearby food providers...</p>
+                    </div>
+                    <div class="agency-list" id="agencyList"></div>
                 </div>
             </section>
 
@@ -583,22 +813,219 @@
     </footer>
 
     <script>
+        let chatHistory = [];
+        let currentDonationItem = '';
+        let currentZipCode = '';
+        let extractedFoodItem = '';
+
         function handleSearch() {
             const searchInput = document.getElementById('donationSearch');
             const searchTerm = searchInput.value.trim();
             
             if (searchTerm) {
-                // For now, just show an alert. Later this will integrate with Gemini AI
-                alert(`Searching for: "${searchTerm}"\n\nThis feature will be enhanced with AI assistance to help you find the best donation options!`);
+                // Transform to chat interface
+                showChatInterface();
+                // Send the initial message
+                sendInitialMessage(searchTerm);
             } else {
                 alert('Please enter what you would like to donate.');
             }
         }
 
-        // Allow Enter key to trigger search
+        function showChatInterface() {
+            const searchContainer = document.getElementById('searchContainer');
+            const chatContainer = document.getElementById('chatContainer');
+            const searchSection = document.getElementById('searchSection');
+            
+            searchContainer.style.display = 'none';
+            chatContainer.classList.add('active');
+            searchSection.classList.add('expanded');
+        }
+
+        function sendInitialMessage(message) {
+            addMessageToChat('user', message);
+            chatHistory.push({ role: 'user', content: message });
+            currentDonationItem = message;
+            
+            // Send to AI
+            sendToAI(message);
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                addMessageToChat('user', message);
+                chatHistory.push({ role: 'user', content: message });
+                chatInput.value = '';
+                
+                // Check if it's a zip code
+                if (isZipCode(message)) {
+                    currentZipCode = message;
+                    loadAgencies(message);
+                } else {
+                    sendToAI(message);
+                }
+            }
+        }
+
+        function isZipCode(text) {
+            // Simple zip code validation (5 digits)
+            return /^\d{5}$/.test(text);
+        }
+
+        function sendToAI(message) {
+            const chatSendButton = document.getElementById('chatSendButton');
+            chatSendButton.disabled = true;
+            
+            fetch('/donate/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    history: chatHistory
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    addMessageToChat('assistant', data.response);
+                    chatHistory.push({ role: 'assistant', content: data.response });
+                    
+                    // Store extracted food item if available
+                    if (data.extracted_food_item) {
+                        extractedFoodItem = data.extracted_food_item;
+                    }
+                    
+                    if (data.needs_zip) {
+                        showAgencySelection();
+                    }
+                } else {
+                    const errorMsg = data.error || 'Sorry, I encountered an error. Please try again.';
+                    addMessageToChat('assistant', errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, I encountered a network error. Please check your connection and try again.');
+            })
+            .finally(() => {
+                chatSendButton.disabled = false;
+            });
+        }
+
+        function addMessageToChat(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const avatar = role === 'user' ? '👤' : '🤖';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showAgencySelection() {
+            const agencySelection = document.getElementById('agencySelection');
+            agencySelection.classList.add('active');
+        }
+
+        function loadAgencies(zipCode) {
+            const loadingAgencies = document.getElementById('loadingAgencies');
+            const agencyList = document.getElementById('agencyList');
+            
+            loadingAgencies.classList.add('active');
+            agencyList.innerHTML = '';
+            
+            fetch(`/donate/agencies?zip_code=${zipCode}`)
+            .then(response => response.json())
+            .then(data => {
+                loadingAgencies.classList.remove('active');
+                
+                if (data.agencies && data.agencies.length > 0) {
+                    // Show note if geocoding failed
+                    if (data.note) {
+                        const noteDiv = document.createElement('div');
+                        noteDiv.style.cssText = 'padding: 10px; background: #FFF3E0; border: 1px solid #FFB74D; border-radius: 5px; margin-bottom: 10px; color: #E65100; font-size: 12px;';
+                        noteDiv.textContent = data.note;
+                        agencyList.appendChild(noteDiv);
+                    }
+                    
+                    data.agencies.forEach(agency => {
+                        const agencyItem = document.createElement('div');
+                        agencyItem.className = 'agency-item';
+                        agencyItem.innerHTML = `
+                            <div class="agency-name">${agency.name}</div>
+                            <div class="agency-details">
+                                ${agency.address} • ${agency.distance}
+                                ${agency.phone !== 'Phone not available' ? ' • ' + agency.phone : ''}
+                            </div>
+                        `;
+                        agencyItem.onclick = () => selectAgency(agency);
+                        agencyList.appendChild(agencyItem);
+                    });
+                } else {
+                    agencyList.innerHTML = '<div style="padding: 20px; text-align: center; color: #114F50;">No food providers found in your area. Please try a different zip code.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loadingAgencies.classList.remove('active');
+                agencyList.innerHTML = '<div style="padding: 20px; text-align: center; color: #FF6B35;">Error loading food providers. Please try again.</div>';
+            });
+        }
+
+        function selectAgency(agency) {
+            // Use extracted food item if available, otherwise use current donation item
+            const donationItem = extractedFoodItem || currentDonationItem;
+            
+            // Update donation in database
+            fetch('/donate/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    agency_id: agency.id,
+                    donation_item: donationItem
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    addMessageToChat('assistant', data.message);
+                    chatHistory.push({ role: 'assistant', content: data.message });
+                    
+                    // Hide agency selection
+                    const agencySelection = document.getElementById('agencySelection');
+                    agencySelection.classList.remove('active');
+                } else {
+                    addMessageToChat('assistant', 'Sorry, there was an error processing your donation. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, there was an error processing your donation. Please try again.');
+            });
+        }
+
+        // Event listeners
         document.getElementById('donationSearch').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 handleSearch();
+            }
+        });
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
     </script>

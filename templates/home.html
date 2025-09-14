@@ -148,8 +148,15 @@
             overflow: hidden;
         }
 
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            height: 400px;
+        }
+
         .carousel-slide {
             height: 400px;
+            min-width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -351,11 +358,15 @@
             <section class="carousel-section fade-in-up-delay-2">
                 <h2 class="carousel-title">Community Impact</h2>
                 <div class="carousel-container">
-                    <div class="carousel-slide">
-                        <div class="carousel-placeholder">
-                            <div class="carousel-placeholder-icon">🍽️</div>
-                            <div class="carousel-placeholder-text">Food Donation Events</div>
-                            <div class="carousel-placeholder-subtext">Images of community food drives and donation events will appear here</div>
+                    <div class="carousel-track">
+                        <div class="carousel-slide">
+                            <img src="{{ url_for('static', filename='fooddonation1.png') }}" alt="Food Donation Event 1" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{{ url_for('static', filename='fooddonation2.png') }}" alt="Food Donation Event 2" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="{{ url_for('static', filename='fooddonation3.png') }}" alt="Food Donation Event 3" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                     </div>
                     <div class="carousel-nav">
@@ -415,14 +426,21 @@
             }
         });
 
-        // Simple carousel functionality
+        // Carousel functionality
         let currentSlide = 0;
         const dots = document.querySelectorAll('.carousel-dot');
+        const track = document.querySelector('.carousel-track');
+        const totalSlides = dots.length;
         
         function updateCarousel() {
+            // Update dots
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === currentSlide);
             });
+            
+            // Update track position with smooth sliding
+            const translateX = -currentSlide * 100;
+            track.style.transform = `translateX(${translateX}%)`;
         }
 
         dots.forEach((dot, index) => {
@@ -434,7 +452,7 @@
 
         // Auto-advance carousel
         setInterval(() => {
-            currentSlide = (currentSlide + 1) % dots.length;
+            currentSlide = (currentSlide + 1) % totalSlides;
             updateCarousel();
         }, 5000);
     </script>

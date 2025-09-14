@@ -546,13 +546,23 @@
           map.setCenter({ lat: data[0].latitude, lng: data[0].longitude });
 
           data.forEach(site => {
+            // Use bright orange marker for agencies with updates
+            const markerColor = site.has_updates ? '#FF4500' : '#5DBA68';
+            const markerIcon = site.has_updates ? 
+              'http://maps.google.com/mapfiles/ms/icons/orange-dot.png' : 
+              'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+            
             const marker = new google.maps.Marker({
               position: { lat: site.latitude, lng: site.longitude },
               map: map,
               title: site.name,
-              phone: site.phone
+              phone: site.phone,
+              icon: markerIcon
             });
 
+            const updatesInfo = site.has_updates ? 
+              `<br><strong style="color: #FF4500; font-size: 14px; background: #FFF3E0; padding: 5px; border-radius: 5px; display: inline-block;">📢 ${site.updates}</strong><br>` : '';
+            
             const info = new google.maps.InfoWindow({
               content: `<strong>${site.name}</strong><br><br>
               <strong>Address:</strong> ${site.address}<br>
@@ -562,6 +572,7 @@
               <strong>Appointment:</strong> ${site.appointment}<br>
               <strong>Prepared Meals:</strong> ${site.Prepared_meals}<br>
               <strong>Home Delivery:</strong> ${site.home_delivery}<br>
+              ${updatesInfo}
               <button onclick="navigateTo(${site.latitude}, ${site.longitude})">Get Directions</button>`
             });
 
@@ -590,13 +601,23 @@
           map.setCenter(originCoords);
 
           data.forEach(site => {
+            // Use bright orange marker for agencies with updates
+            const markerColor = site.has_updates ? '#FF4500' : '#5DBA68';
+            const markerIcon = site.has_updates ? 
+              'http://maps.google.com/mapfiles/ms/icons/orange-dot.png' : 
+              'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+            
             const marker = new google.maps.Marker({
               position: { lat: site.latitude, lng: site.longitude },
               map: map,
               title: site.name,
-              phone: site.phone
+              phone: site.phone,
+              icon: markerIcon
             });
 
+            const updatesInfo = site.has_updates ? 
+              `<br><strong style="color: #FF4500; font-size: 14px; background: #FFF3E0; padding: 5px; border-radius: 5px; display: inline-block;">📢 ${site.updates}</strong><br>` : '';
+            
             const info = new google.maps.InfoWindow({
               content: `<strong>${site.name}</strong><br><br>
               <strong>Address:</strong> ${site.address}<br>
@@ -606,6 +627,7 @@
               <strong>Appointment:</strong> ${site.appointment}<br>
               <strong>Prepared Meals:</strong> ${site.Prepared_meals}<br>
               <strong>Home Delivery:</strong> ${site.home_delivery}<br>
+              ${updatesInfo}
               <button onclick="navigateTo(${site.latitude}, ${site.longitude})">Get Directions</button>`
             });
 
