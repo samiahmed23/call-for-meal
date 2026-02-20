@@ -13,7 +13,7 @@ import google.generativeai as genai
 
 api_blueprint = Blueprint("api", __name__)
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 
 # Configure logging
